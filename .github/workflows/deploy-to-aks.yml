@@ -1,0 +1,29 @@
+name: Deploy argocd to AKS cluster
+
+on:
+  workflow_dispatch:
+    push:
+        branches:
+        - main
+
+jobs:
+  deploy-to-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set up kubectl
+      uses: azure/k8s-set-context@v1
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+    - name: Verify kubectl context
+      run: |
+        kubectl config view

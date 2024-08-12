@@ -48,11 +48,19 @@ jobs:
     - name: Login to Azure
       uses: azure/login@v2
       with:
-#        client-id: ${{ vars.AZURE_CLIENT_ID }}
-#        tenant-id: ${{ vars.AZURE_TENANT_ID }}
-#        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
         creds: '{"clientId":"${{ vars.AZURE_CLIENT_ID }}","clientSecret":"${{ vars.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
         auth-type: service_principal
+
+    - name: Set AKS context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: javahelenaResourceGroup
+        cluster-name: javahelena-aks
+
+    - name: Verify kubectl access
+      run: |
+        kubectl config currect-context
+        kubectl get nodes
 
     - name: Azure CLI script
       uses: azure/cli@v2

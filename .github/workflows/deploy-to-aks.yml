@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - azure-login
 
 jobs:
   verify-secrets:
@@ -36,7 +37,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
 #    - uses: azure/login@v2
 #      with:

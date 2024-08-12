@@ -16,6 +16,7 @@ env:
 jobs:
   verify-secrets:
     runs-on: ubuntu-latest
+    environment: aks
     env:
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
@@ -33,6 +34,7 @@ jobs:
           echo "Variable AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}"
           echo "Variable AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}"
           echo "Variable AZURE_CLIENT_SECRET: ${{ vars.AZURE_CLIENT_SECRET }}"
+          echo "Secret AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}"
           
 
       - name: Check CLIENT_ID variable
@@ -57,6 +59,7 @@ jobs:
 
   deploy-to-dev:
     runs-on: ubuntu-latest
+    environment: aks
     env:
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}

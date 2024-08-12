@@ -16,6 +16,11 @@ env:
 jobs:
   verify-secrets:
     runs-on: ubuntu-latest
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_SECRET: ${{ vars.AZURE_CLIENT_SECRET }}
 
     steps:
       - name: Echo environment variables
@@ -24,6 +29,11 @@ jobs:
           echo "AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}"
           echo "AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}"
           echo "AZURE_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}"
+          echo "Variable AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}"
+          echo "Variable AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}"
+          echo "Variable AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}"
+          echo "Variable AZURE_CLIENT_SECRET: ${{ vars.AZURE_CLIENT_SECRET }}"
+          
 
       - name: Check CLIENT_ID variable
         run: echo "CLIENT_ID is set"
@@ -47,6 +57,11 @@ jobs:
 
   deploy-to-dev:
     runs-on: ubuntu-latest
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_SECRET: ${{ vars.AZURE_CLIENT_SECRET }}
 
     steps:
     - name: Checkout code

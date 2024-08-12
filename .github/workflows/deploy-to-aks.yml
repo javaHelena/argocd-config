@@ -59,7 +59,7 @@ jobs:
 
     - name: Verify kubectl access
       run: |
-        kubectl config currect-context
+        kubectl config current-context
         kubectl get nodes
 
     - name: Azure CLI script

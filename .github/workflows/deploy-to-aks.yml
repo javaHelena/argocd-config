@@ -5,26 +5,28 @@ on:
   push:
     branches:
       - main
+      - azure-login
 
 jobs:
   verify-secrets:
     runs-on: ubuntu-latest
+    environment: aks
 
     steps:
-      - name: Check CLIENT_ID secret
+      - name: Check CLIENT_ID variable
         run: echo "CLIENT_ID is set"
         env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_ID: ${{ vars.CLIENT_ID }}
 
-      - name: Check TENANT_ID secret
+      - name: Check TENANT_ID variable
         run: echo "TENANT_ID is set"
         env:
-          TENANT_ID: ${{ secrets.TENANT_ID }}
+          TENANT_ID: ${{ vars.TENANT_ID }}
 
-      - name: Check AZURE_SUBSCRIPTION_ID secret
+      - name: Check AZURE_SUBSCRIPTION_ID variable
         run: echo "AZURE_SUBSCRIPTION_ID is set"
         env:
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - name: Check KUBE_CONFIG secret
         run: echo "KUBE_CONFIG is set"
@@ -33,10 +35,11 @@ jobs:
 
   deploy-to-dev:
     runs-on: ubuntu-latest
+    environment: aks
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
 #    - uses: azure/login@v2
 #      with:
@@ -45,11 +48,19 @@ jobs:
     - name: Login to Azure
       uses: azure/login@v2
       with:
-        client-id: ${{ vars.AZURE_CLIENT_ID }}
-        tenant-id: ${{ vars.AZURE_TENANT_ID }}
-        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
         creds: '{"clientId":"${{ vars.AZURE_CLIENT_ID }}","clientSecret":"${{ vars.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
         auth-type: service_principal
+
+    - name: Set AKS context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: javahelenaResourceGroup
+        cluster-name: javahelena-aks
+
+    - name: Verify kubectl access
+      run: |
+        kubectl config current-context
+        kubectl get nodes
 
     - name: Azure CLI script
       uses: azure/cli@v2
@@ -58,11 +69,20 @@ jobs:
         inlineScript: |
           az account show
 
-    - name: Set up kubectl
-      uses: azure/k8s-set-context@v1
-      with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
-
     - name: Verify kubectl context
       run: |
         kubectl config view
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v2
+      with:
+        version: v3.7.1  # specify the version of Helm to install
+
+    - name: Add ArgoCD Helm repo
+      run: |
+        helm repo add argo https://argoproj.github.io/argo-helm
+        helm repo update
+
+    - name: Deploy ArgoCD
+      run: |
+        helm upgrade --install argocd argo/argo-cd --namespace argocd 

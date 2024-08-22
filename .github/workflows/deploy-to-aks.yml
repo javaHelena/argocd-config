@@ -1,4 +1,4 @@
-name: Verifying Secrets
+name: Deploy argocd to AKS cluster
 
 on:
   workflow_dispatch:

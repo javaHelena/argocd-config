@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - azure-login
 
 jobs:
   verify-secrets:
@@ -16,7 +15,7 @@ jobs:
       - name: Check CLIENT_ID variable
         run: echo "CLIENT_ID is set"
         env:
-          CLIENT_ID: ${{ vars.CLIENT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
 
       - name: Check TENANT_ID variable
         run: echo "TENANT_ID is set"
@@ -41,14 +40,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-#    - uses: azure/login@v2
-#      with:
-#        creds: '{"clientId":"${{ vars.AZURE_CLIENT_ID }}","clientSecret":"${{ vars.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
-
     - name: Login to Azure
       uses: azure/login@v2
       with:
-        creds: '{"clientId":"${{ vars.AZURE_CLIENT_ID }}","clientSecret":"${{ vars.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ vars.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ vars.AZURE_TENANT_ID }}"}'
+        creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
         auth-type: service_principal
 
     - name: Set AKS context

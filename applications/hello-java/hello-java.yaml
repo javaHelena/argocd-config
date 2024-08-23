@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello-java
+  namespace: argocd  # Replace with your Argo CD namespace
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/javahelena/hello-java'  # Replace with your repo URL
+    targetRevision: HEAD  # You can specify a branch, tag, or commit hash
+    path: k8s/hello-java  # Path to your Helm chart in the hello-java repo
+  destination:
+    server: 'https://kubernetes.default.svc'  # Cluster URL, usually the default for in-cluster
+    namespace: hello  # Namespace where the app will be deployed
+  syncPolicy:
+    automated:
+      prune: true  # Automatically remove resources that are no longer defined in the repo
+      selfHeal: true  # Automatically sync if the cluster state diverges from the repo

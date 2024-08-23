@@ -1,0 +1,62 @@
+name: Deploy NGINX Ingress Controller to AKS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-ingress:
+    runs-on: ubuntu-latest
+    environment: aks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+          auth-type: service_principal
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: javahelenaResourceGroup
+          cluster-name: javahelena-aks
+
+      - name: Verify kubectl access
+        run: |
+          kubectl config current-context
+          kubectl get nodes
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v2
+        with:
+          version: v3.7.1
+
+      - name: Add NGINX Ingress Helm repo
+        run: |
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo update
+
+      - name: Install NGINX Ingress Controller
+        run: |
+          helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
+            --namespace ingress-nginx --create-namespace \
+            --set controller.replicaCount=2 \
+            --set controller.nodeSelector."kubernetes\.io/os"=linux \
+            --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
+            --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux
+
+      - name: Verify NGINX Ingress Controller
+        run: |
+          kubectl get svc -n ingress-nginx
+          kubectl get pods -n ingress-nginx
+
+      - name: Configure Ingress for hello-java
+        run: |
+          kubectl apply -f path/to/your/ingress.yaml -n hello
+

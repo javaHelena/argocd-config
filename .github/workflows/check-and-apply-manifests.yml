@@ -2,9 +2,7 @@ name: Apply hello-java Application to Argo CD
 
 on:
   workflow_dispatch:
-  workflow_call:
-
-
+  workflow_call: {}
 
 jobs:
   apply-hello-java-to-argocd:
@@ -14,6 +12,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Test Secrets Access
+        run: |
+          echo "Testing Azure secrets:"
+          echo "Client ID: ${{ secrets.AZURE_CLIENT_ID }}"
+          echo "Client Secret Length: ${{ secrets.AZURE_CLIENT_SECRET }}"
+          echo "Subscription ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          echo "Tenant ID: ${{ secrets.AZURE_TENANT_ID }}"
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -26,11 +32,6 @@ jobs:
         with:
           resource-group: javahelenaResourceGroup
           cluster-name: javahelena-aks
-
-      - name: Verify kubectl access
-        run: |
-          kubectl config current-context
-          kubectl get nodes
 
       - name: Check if hello-java application exists
         id: check-app
@@ -55,4 +56,3 @@ jobs:
           echo "Applying the hello-java application manifest to Argo CD..."
           kubectl apply -f applications/hello-java/hello-java.yml -n argocd
           echo "hello-java application manifest applied successfully."
-

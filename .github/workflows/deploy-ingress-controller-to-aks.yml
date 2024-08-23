@@ -45,11 +45,13 @@ jobs:
 
       - name: Install NGINX Ingress Controller
         run: |
-          helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-            --namespace ingress-nginx --create-namespace \
-            --version 4.11.2 \  # Specify the stable Helm chart version
-            --set controller.replicaCount=1 \                                     # Default value is 1
-            --set controller.nodeSelector."kubernetes\.io/os"=linux \             # Just for safety. Do not wan to use windows nodes
+          helm upgrade --install ingress-nginx-controller ingress-nginx/ingress-nginx \
+            --namespace ingress --create-namespace \
+            --version 4.11.2 \
+            --set controller.replicaCount=1 \
+            --set controller.nodeSelector."kubernetes\.io/os"=linux \
+            --set controller.service.externalTrafficPolicy=Local \
+            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-internal"="true"
 
       - name: Verify NGINX Ingress Controller
         run: |

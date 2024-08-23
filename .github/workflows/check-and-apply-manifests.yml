@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "Testing Azure secrets:"
           echo "Client ID: ${{ secrets.AZURE_CLIENT_ID }}"
-          echo "Client Secret Length: ${{ #secrets.AZURE_CLIENT_SECRET }}"
+          echo "Client Secret Length: ${{ secrets.AZURE_CLIENT_SECRET }}"
           echo "Subscription ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
           echo "Tenant ID: ${{ secrets.AZURE_TENANT_ID }}"
 

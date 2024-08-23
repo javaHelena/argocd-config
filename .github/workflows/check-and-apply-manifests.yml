@@ -27,6 +27,11 @@ jobs:
           resource-group: javahelenaResourceGroup
           cluster-name: javahelena-aks
 
+      - name: Verify kubectl access
+        run: |
+          kubectl config current-context
+          kubectl get nodes
+
       - name: Check if hello-java application exists
         id: check-app
         run: |

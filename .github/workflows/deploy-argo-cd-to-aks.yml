@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - manifests
 
 
 jobs:
@@ -57,6 +58,10 @@ jobs:
     - name: Deploy ArgoCD
       run: |
         helm upgrade --install argocd argo/argo-cd --namespace argocd 
+
+    - name: Wait for Argo CD Pods to be Ready
+      run: |
+        kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
 
   call-apply-hello-java:
     needs: deploy-argocd-to-aks

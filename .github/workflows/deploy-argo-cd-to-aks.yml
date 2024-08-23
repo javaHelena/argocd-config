@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - ingress-controller
 
 jobs:
   deploy-argocd-to-aks:
@@ -44,7 +45,7 @@ jobs:
         kubectl config view
 
     - name: Setup Helm
-      uses: azure/setup-helm@v2
+      uses: azure/setup-helm@v4.2.0
       with:
         version: v3.7.1  # specify the version of Helm to install
 

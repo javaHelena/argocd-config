@@ -1,0 +1,53 @@
+name: Apply hello-java Application to Argo CD
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+
+
+jobs:
+  apply-hello-java-to-argocd:
+    runs-on: ubuntu-latest
+    environment: aks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+          auth-type: service_principal
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: javahelenaResourceGroup
+          cluster-name: javahelena-aks
+
+      - name: Check if hello-java application exists
+        id: check-app
+        run: |
+          echo "Checking if the hello-java application exists in Argo CD..."
+          if kubectl get app hello-java -n argocd; then
+            echo "Application hello-java exists."
+            echo "exitcode=0" >> $GITHUB_ENV
+          else
+            echo "Application hello-java does not exist."
+            echo "exitcode=1" >> $GITHUB_ENV
+          fi
+        continue-on-error: true
+
+      - name: Log exit code from check
+        run: |
+          echo "Exit code from application check: ${{ env.exitcode }}"
+
+      - name: Apply hello-java Application to ArgoCD
+        if: env.exitcode != '0'
+        run: |
+          echo "Applying the hello-java application manifest to Argo CD..."
+          kubectl apply -f applications/hello-java/hello-java.yml -n argocd
+          echo "hello-java application manifest applied successfully."
+

@@ -57,3 +57,7 @@ jobs:
     - name: Deploy ArgoCD
       run: |
         helm upgrade --install argocd argo/argo-cd --namespace argocd 
+
+  call-apply-hello-java:
+    needs: deploy-argocd-to-aks
+    uses: ./.github/workflows/check-and-apply-manifests.yml

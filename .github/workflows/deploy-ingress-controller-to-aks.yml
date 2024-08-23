@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  deploy-ingress:
+  deploy-ingress-to-aks:
     runs-on: ubuntu-latest
     environment: aks
 
@@ -55,8 +55,4 @@ jobs:
         run: |
           kubectl get svc -n ingress-nginx
           kubectl get pods -n ingress-nginx
-
-      - name: Configure Ingress for hello-java
-        run: |
-          kubectl apply -f path/to/your/ingress.yaml -n hello
 

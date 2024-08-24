@@ -3,6 +3,10 @@ name: Apply hello-java Application to Argo CD
 on:
   workflow_dispatch:
   workflow_call: {}
+  workflow_run:
+    workflows: [ "Deploy argocd to AKS cluster" ]  # The name of the primary workflow
+    types:
+      - completed
 
 jobs:
   apply-hello-java-to-argocd:

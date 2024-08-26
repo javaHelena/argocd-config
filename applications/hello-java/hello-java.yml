@@ -12,7 +12,4 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'  # Cluster URL, usually the default for in-cluster
     namespace: hello  # Namespace where the app will be deployed
-  syncPolicy:
-    automated:
-      prune: true  # Automatically remove resources that are no longer defined in the repo
-      selfHeal: true  # Automatically sync if the cluster state diverges from the repo
+  syncPolicy: {}  # Manual sync policy
